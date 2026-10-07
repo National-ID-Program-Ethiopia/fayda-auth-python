@@ -1,3 +1,4 @@
+import requests
 from typing import Dict, Any
 from ..utils.responses import SuccessResponse, ErrorResponse
 from ..utils.utils import fayda_unique_code_verifier_generator, fayda_unique_code_challenge_generator
@@ -17,6 +18,7 @@ class FaydaOAuthHandler:
         self.user_info_url = user_info_url
         self.private_key = private_key
         self.client_assertion_type = client_assertion_type
+        self.http_client = requests.Session()
 
     def authorize(self, host_manager: HostConfigManager, request_origin: str, request_referer: str = "") -> Dict[str, str]:
         redirect_uri = host_manager.get_redirect_uri(request_origin)
@@ -75,9 +77,14 @@ class FaydaOAuthHandler:
             self.token_url,
             self.client_id,
             self.client_assertion_type,
-            self.private_key
+            self.private_key,
+            session=self.http_client
         )
-        user_info = fetch_user_info_from_fayda(token_data['access_token'], self.user_info_url)
+        user_info = fetch_user_info_from_fayda(
+            token_data['access_token'], 
+            self.user_info_url,
+            session=self.http_client
+        )
 
         return SuccessResponse("User authenticated successfully", user_info, 200).__dict__()
 

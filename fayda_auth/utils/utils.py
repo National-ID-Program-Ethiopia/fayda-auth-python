@@ -39,7 +39,7 @@ def fayda_client_assertion_secret_generator(client_id: str, token_url: str, priv
         "iss": client_id,
         "aud": token_url,
         "sub": client_id,
-        "exp": int(time.time()) + 24 * 3600,  # 24 hours
+        "exp": int(time.time()) + 5 * 60,  # 5 minutes
         "iat": int(time.time())
     }
 
